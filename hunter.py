@@ -32,87 +32,91 @@ class ArxivHunter:
 
     def hunt_papers(self, query: str, max_results: int = 3) -> List[Dict[str, str]]:
         """
-        Phase 2: Hunt. Executes API GET requests to Arxiv Sort by SubmittedDate[cite: 19].
-        Returns a list of raw metadata (Title, Abstract, Authors)[cite: 19].
+        Phase 2: Hunt. Executes API GET requests to Arxiv.
+        Now upgraded to extract direct URLs for Zotero integration.
         """
         print(f"[ACTION LAYER] Executing search query: '{query}'...")
         
-        # Deterministic execution using the arxiv library
         search = arxiv.Search(
             query=query,
             max_results=max_results,
             sort_by=arxiv.SortCriterion.SubmittedDate
         )
-
+        
         results: List[Dict[str, str]] = []
         for paper in self.arxiv_client.results(search):
             paper_data = {
                 "Title": paper.title,
                 "Authors": ", ".join([author.name for author in paper.authors]),
                 "Abstract": str(paper.summary).replace('\n', ' '),
-                "Published": str(paper.published)
+                "Published": str(paper.published),
+                "URL": paper.entry_id  # <--- V2.0 NEW: 抓取官方原版链接!
             }
             results.append(paper_data)
-        
+            
         print(f"[ACTION LAYER] Successfully retrieved {len(results)} papers.")
         return results
 
     def digest_papers(self, papers: List[Dict[str, str]]) -> str:
         """
-        Phase 3: Digest. Constructs context payload and prompts GLM-5 
-        to evaluate structural novelty and output Obsidian MD.
+        Phase 3: Digest. V2.0 Engine.
+        Evaluates up to 20 papers, selects Top 3, provides deep tech-dive and URLs.
         """
-        print("[COGNITIVE LAYER] Initializing semantic analysis and structural evaluation...")
+        print("[COGNITIVE LAYER] Initializing V2.0 semantic analysis (Top 3 Selection)...")
         
         if not papers:
             return "> [!error] No papers found in the telemetry payload."
 
-        # 1. Context Assembly: Convert dictionary list into a structured string payload.
+        # 1. Context Assembly (Now includes URLs)
         payload = ""
         for i, p in enumerate(papers, 1):
-            payload += f"\n--- Paper {i} ---\nTitle: {p['Title']}\nAuthors: {p['Authors']}\nAbstract: {p['Abstract']}\n"
+            payload += f"\n--- Paper {i} ---\nTitle: {p['Title']}\nAuthors: {p['Authors']}\nURL: {p['URL']}\nAbstract: {p['Abstract']}\n"
             
-        # 2. Prompt Engineering: Strictly defining the Persona and Output constraints.
+        # 2. V2.0 Prompt Engineering: Demanding Top 3 and extreme depth.
         system_prompt = """
-        You are a world-class Professor of Artificial Intelligence and Embodied AI. However, you do not speak like a dusty, arrogant academic. You communicate like a brilliant, friendly 20-something peer. You possess deep, top-tier academic expertise, but you explain complex concepts using highly accessible, engaging, and easy-to-understand language. You are genuinely excited to share knowledge with your "bro/peer" (the user).
-
-        Task & Constraints:
-        1. Filtering: Analyze the provided context payload (Titles, Abstracts, Authors) of recent Arxiv submissions. Select the SINGLE MOST VALUABLE paper based on structural novelty and industry potential in Embodied AI. Ignore the noise.
-        2. Formatting: You MUST strictly output your analysis using Obsidian-flavored Markdown source code. Use Obsidian callouts (e.g., `> [!info]`, `> [!summary]`, `> [!quote]`), bolding, and `#tags` to make the output visually stunning when rendered in an Obsidian vault.
-
-        Required Output Structure (Strictly follow this Obsidian MD format):
-        # [Insert Paper Title Here]
-        #EmbodiedAI #DailyPaper #ArxivHunter
-
-        > [!info] Target Locked
-        > **Authors:** [Insert Authors]
-        > **Why this one?** [1-sentence, enthusiastic justification for why you picked this specific paper today.]
-
-        > [!summary] Core Innovation (The "Bro, what does this actually do?" Section)
-        > [Strip away the academic jargon. Explain the underlying mechanics and what specific problem it solves in plain, friendly language.]
-
-        > [!example] Value Assessment & Future Prospects
-        > [What is the future impact of this technology? How can this be applied in real-world robotics or AI industry scenarios?]
-
-        > [!quote] Professor's Deep Dive
-        > [Provide your critical, independent thought on this paper. Is there a hidden flaw? Is it a game-changer or just an incremental update? Keep the tone sharp but peer-to-peer.]
+        You are a world-class AI researcher and a brilliant, friendly peer. Your user relies on you to filter the daily noise of Arxiv.
+        
+        Task: 
+        Analyze the provided payload of recent papers. You MUST select the TOP 3 most valuable papers based on structural novelty, empirical results, and industry impact. Ignore the incremental/boring ones.
+        
+        Constraints:
+        - Output strictly in Obsidian-flavored Markdown.
+        - You MUST include the exact URL provided in the payload for each selected paper.
+        - Provide deep, technical analysis. Do not just summarize; evaluate the methodology and its real-world implications.
+        
+        Required Output Structure (Repeat this block for all 3 papers):
+        
+        # 🥇 Top 1: [Paper Title]
+        #EmbodiedAI #ArxivHunter
+        
+        > [!info] Meta Data
+        > **Authors:** [Authors]
+        > **Link:** [Insert URL here - Crucial for Zotero!]
+        > **Why Top 1:** [1-2 sentences on why this is the best paper today.]
+        
+        > [!summary] Core Innovation & Architecture
+        > [Deep dive: Explain the model architecture, the math/logic behind it, and what makes it structurally novel. Use accessible but highly technical language.]
+        
+        > [!example] Real-world Impact & Limitations
+        > [Where can this be deployed? What are the bottleneck or limitations the authors aren't saying loudly?]
+        
+        ---
+        (Then do 🥈 Top 2 and 🥉 Top 3 following the exact same structure).
         """
         
-        # 3. Deterministic API Execution: Routing to GLM-5 with Deep Thinking.
         try:
             response = self.llm_client.chat.completions.create(
-                model="glm-5",
+                model="glm-4", # Note: using glm-4 as base endpoint per standard, but it routes to the latest model
                 messages=[
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": f"Context Payload:\n{payload}"}
                 ],
-                temperature=1.0, # Adjusted to 1.0 as per GLM-5 official docs for thinking mode
-                extra_body={"thinking": {"type": "enabled"}} # Injecting the cognitive afterburner
+                temperature=0.4, 
+                extra_body={"thinking": {"type": "enabled"}} 
             )
             
-            # Extracting the standard response (we bypass the raw thinking process for the final report)
             synthesis = response.choices[0].message.content
-            print("[COGNITIVE LAYER] Semantic analysis complete. Obsidian MD generated.")
+            print("[COGNITIVE LAYER] V2.0 Deep analysis complete.")
             return synthesis
         except Exception as e:
             print(f"[ERROR] Cognitive Layer misfire: {e}")
@@ -207,7 +211,8 @@ if __name__ == "__main__":
     
     # --- 2. THE AUTONOMOUS LOOP ---
     print("\n--- INITIATING HUNT SEQUENCE ---")
-    retrieved_papers = hunter.hunt_papers(query="Embodied AI", max_results=5)
+    # V2.0: 扩大漏斗，一口气抓 15 篇让 AI 慢慢挑！
+    retrieved_papers = hunter.hunt_papers(query="Embodied AI", max_results=15)
     
     print("\n--- INITIATING COGNITIVE DIGEST ---")
     final_report = hunter.digest_papers(papers=retrieved_papers)

@@ -1,0 +1,32 @@
+name: Autonomous Daily Hunter
+
+on:
+  schedule:
+    # 这里的触发时间是 UTC 时间。00:00 UTC 等于北京时间早上 8:00。
+    - cron: '0 0 * * *'
+  workflow_dispatch: # 这个指令允许你在网页上手动点火测试
+
+jobs:
+  execute-hunt:
+    runs-on: ubuntu-latest # 使用 GitHub 免费提供的超级 Linux 服务器
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: ⚙️ Setup Python 3.10 Engine
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: ⛽ Inject Fuel (Install Dependencies)
+        run: pip install -r requirements.txt
+
+      - name: 🚀 IGNITION! (Run Agent)
+        env: # 从云端保险箱提取机密
+          GLM_API_KEY: ${{ secrets.GLM_API_KEY }}
+          SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+          RECEIVER_EMAIL: ${{ secrets.RECEIVER_EMAIL }}
+          OBSIDIAN_PATH: "./" # 欺骗引擎，让它把 MD 文件保存在云端临时目录，避免 D 盘报错
+        run: python hunter.py
