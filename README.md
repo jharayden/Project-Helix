@@ -1,22 +1,54 @@
-# 🚀 Arxiv Hunter v1.0
-**An Autonomous AI Agent for Academic Paper Hunting and Digestion.**
+# 🏎️ Arxiv Hunter V2.0: Autonomous Academic Telemetry
 
-## 📌 What is this?
-Arxiv Hunter is a fully automated, locally deployed Python agent. It scans the Arxiv database for the latest papers (currently focused on Embodied AI), uses Large Language Models (GLM-5) to analyze their structural novelty, and automatically dispatches the intelligence.
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?logo=streamlit&logoColor=white)](https://streamlit.io)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-This is a **First Principles** implementation of an AI Agent, cleanly separating the Action Layer (Data Retrieval), Cognitive Layer (LLM Digestion), and Report Layer (File System & SMTP).
+An autonomous AI agent and local telemetry dashboard designed to hunt, digest, and dispatch the latest Arxiv papers (e.g., Embodied AI, LLMs). Built from first principles, it leverages Large Language Models (GLM-5) to filter the noise and deliver high-signal, deep-tech summaries directly to your inbox and Obsidian vault.
 
-## ✨ Features (v1.0)
-- **📡 Deterministic Telemetry:** Automatically queries Arxiv API for the latest submissions.
-- **🧠 Cognitive Digestion:** Uses Zhipu GLM-5 (with Deep Thinking enabled) to filter noise and select the most valuable paper.
-- **📝 Obsidian Native Integration:** Writes the analysis directly to a local Obsidian Vault using native callouts (`> [!info]`) and `#tags`.
-- **📧 Zero-Dependency Email Dispatch:** Slices the Markdown into a highly readable, clean summary and pushes it to the user's target email via native Python `smtplib`.
-- **🔐 Enterprise-Grade Security:** Utilizes `.env` and `.gitignore` to strictly decouple API keys and passwords from the source code.
-
-## 🗺️ Roadmap (V2.0 Coming Soon)
-- [ ] **Web UI Control Panel:** Dynamic input for search queries (no more hardcoded topics).
-- [ ] **Zotero Integration:** Inclusion of direct Arxiv PDF URLs.
-- [ ] **Deep Dive Expansion:** Expanding the context window to evaluate Top 3 papers with richer technical depth.
+## ✨ V2.0 Core Upgrades
+- 🎛️ **Telemetry Dashboard:** A sleek, dark-mode Streamlit Web UI for real-time local operation and dynamic topic switching.
+- 🧠 **Deep Cognition Engine:** Automatically scans 15+ papers, evaluates structural novelty, and ranks the **Top 3**.
+- 🔗 **Zotero Ready:** Hardcodes direct Arxiv PDF URLs into the output for seamless citation management.
+- ☁️ **Cloud Autopilot:** Pre-configured GitHub Actions YAML for zero-touch, daily 8:00 AM automated email dispatches.
 
 ---
-*Built with coffee, calculus deadlines, and a passion for Embodied AI.*
+
+## 🛠️ Quick Start Guide
+
+### 1. Clone the Repository
+```bash
+git clone [https://github.com/your-username/arxiv-hunter.git](https://github.com/your-username/arxiv-hunter.git)
+cd arxiv-hunter
+```
+
+### 2. Install Dependencies
+```bash
+pip install -r requirements.txt
+pip install streamlit  # Required for the local Web UI
+```
+
+### 3. Configure the Engine (Crucial Step!)
+This project strictly isolates credentials. You must set up your local environment variables:
+1. Find the file named `.env.example` in the root directory.
+2. Copy it and rename the new file to exactly `.env`.
+3. Open `.env` and replace the placeholder text with your actual API keys and email credentials.
+
+### 4. Ignite the Dashboard (Local Mode)
+To launch the interactive control panel on your local machine, run:
+```bash
+streamlit run app.py
+```
+A new browser tab will open. Enter your target sector and hit **IGNITION**!
+
+---
+
+## ☁️ Autopilot Deployment (GitHub Actions)
+Want to wake up to a fresh intelligence report every morning?
+1. Fork this repository.
+2. Go to your repository **Settings > Secrets and variables > Actions**.
+3. Add your secrets (`GLM_API_KEY`, `SENDER_EMAIL`, `EMAIL_PASSWORD`, `RECEIVER_EMAIL`) matching the exact names in the `.env` file.
+4. Enable the workflow in the **Actions** tab. The agent will now run automatically every day at 00:00 UTC.
+
+---
+*Built with ☕, late-night calculus, and a passion for automation.*
