@@ -1,3 +1,4 @@
 arxiv
 zhipuai
 python-dotenv
+openai
