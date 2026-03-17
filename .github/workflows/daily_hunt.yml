@@ -28,5 +28,6 @@ jobs:
           SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
           EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
           RECEIVER_EMAIL: ${{ secrets.RECEIVER_EMAIL }}
-          OBSIDIAN_PATH: "./" # 欺骗引擎，让它把 MD 文件保存在云端临时目录，避免 D 盘报错
+          TARGET_TOPIC: ${{ vars.TARGET_TOPIC }} # <--- V2.1 新增：允许用户在 GitHub Variables 中配置专属主题
+          OBSIDIAN_PATH: "./" 
         run: python hunter.py

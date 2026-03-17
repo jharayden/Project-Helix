@@ -210,9 +210,13 @@ if __name__ == "__main__":
     hunter = ArxivHunter(glm_api_key=api_key)
     
     # --- 2. THE AUTONOMOUS LOOP ---
-    print("\n--- INITIATING HUNT SEQUENCE ---")
-    # V2.0: 扩大漏斗，一口气抓 15 篇让 AI 慢慢挑！
-    retrieved_papers = hunter.hunt_papers(query="Embodied AI", max_results=15)
+    # 【V2.1 新增】：去保险箱里找 TARGET_TOPIC，如果找不到，就默认搜 "Embodied AI"
+    target_topic = os.getenv("TARGET_TOPIC", "Embodied AI") 
+
+    print(f"\n--- INITIATING HUNT SEQUENCE FOR: {target_topic} ---")
+    
+    # 【V2.1 修改】：把写死的 "Embodied AI" 换成动态变量 target_topic
+    retrieved_papers = hunter.hunt_papers(query=target_topic, max_results=15)
     
     print("\n--- INITIATING COGNITIVE DIGEST ---")
     final_report = hunter.digest_papers(papers=retrieved_papers)
