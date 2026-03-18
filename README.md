@@ -48,7 +48,7 @@ Want to wake up to a fresh intelligence report every morning?
 1. Fork this repository.
 2. Go to your repository **Settings > Secrets and variables > Actions**.
 3. Add your secrets (`GLM_API_KEY`, `SENDER_EMAIL`, `EMAIL_PASSWORD`, `RECEIVER_EMAIL`) matching the exact names in the `.env` file.
-4. Enable the workflow in the **Actions** tab. The agent will now run automatically every day at 00:00 UTC.
+4. Enable the workflow in the **Actions** tab. The agent will now run automatically every day at 16:00 UTC.
 
 ---
 *Built with ☕, late-night calculus, and a passion for automation.*
