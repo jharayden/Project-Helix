@@ -210,8 +210,10 @@ if __name__ == "__main__":
     hunter = ArxivHunter(glm_api_key=api_key)
     
     # --- 2. THE AUTONOMOUS LOOP ---
-    # 【V2.1 新增】：去保险箱里找 TARGET_TOPIC，如果找不到，就默认搜 "Embodied AI"
-    target_topic = os.getenv("TARGET_TOPIC", "Embodied AI") 
+    # 【V2.1.1 终极防御补丁】：不仅防丢失，还要防空字符串！
+    target_topic = os.getenv("TARGET_TOPIC")
+    if not target_topic:  # 如果是 None 或者 ""，全部判定为失效
+        target_topic = "Embodied AI"
 
     print(f"\n--- INITIATING HUNT SEQUENCE FOR: {target_topic} ---")
     
