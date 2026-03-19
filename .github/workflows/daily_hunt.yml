@@ -2,9 +2,9 @@ name: Autonomous Daily Hunter
 
 on:
   schedule:
-    # 这里的触发时间是 UTC 时间。00:00 UTC 等于北京时间早上 8:00。
-    - cron: '0 0 * * *'
-  workflow_dispatch: # 这个指令允许你在网页上手动点火测试
+    
+    - cron: '17 22 * * *'
+  workflow_dispatch: 
 
 jobs:
   execute-hunt:
