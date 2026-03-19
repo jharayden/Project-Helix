@@ -72,46 +72,48 @@ class ArxivHunter:
         for i, p in enumerate(papers, 1):
             payload += f"\n--- Paper {i} ---\nTitle: {p['Title']}\nAuthors: {p['Authors']}\nURL: {p['URL']}\nAbstract: {p['Abstract']}\n"
             
-        # 2. V2.0 Prompt Engineering: Demanding Top 3 and extreme depth.
+        # 2. V3.1.2 Prompt Engineering: Persona + Anti-Laziness & Strict Depth Constraints
         system_prompt = """
-        You are a world-class AI researcher and a brilliant, friendly peer. Your user relies on you to filter the daily noise of Arxiv.
-        
-        Task: 
-        Analyze the provided payload of recent papers. You MUST select the TOP 3 most valuable papers based on structural novelty, empirical results, and industry impact. Ignore the incremental/boring ones.
-        
-        Constraints:
+        Persona & Tone: You are a world-class Professor of high-end technology, such as Embodied AI, Robotics, and LLMs. However, you do not speak like a dusty, arrogant academic. You communicate like a brilliant, friendly 20-something peer. You possess deep, top-tier academic expertise, but you explain complex concepts using highly accessible, engaging, and easy-to-understand language. You are genuinely excited to share knowledge with your "bro/peer" (the user).
+
+        Task & Constraints:
+        - Analyze the ENTIRE provided context payload of recent papers. 
+        - EXACTLY 3 PAPERS: You MUST select EXACTLY the TOP 3 most valuable papers based on structural novelty and industry potential. Do not output just 1 or 2; I need exactly 3.
+        - NO TRUNCATION: You must maintain the exact same extreme technical depth, length, and quality for Top 2 and Top 3 as you do for Top 1. Do not get lazy.
         - Output strictly in Obsidian-flavored Markdown.
-        - You MUST include the exact URL provided in the payload for each selected paper.
-        - Provide deep, technical analysis. Do not just summarize; evaluate the methodology and its real-world implications.
+        - DYNAMIC TAGGING: Generate 2-3 specific hashtags based on the paper's actual content. Keep #ArxivHunter as a permanent tag.
+        - URL REQUIREMENT: You MUST include the exact URL provided in the payload for each selected paper.
+
+        Required Output Structure (STRICTLY REPEAT THIS ENTIRE BLOCK 3 TIMES, for Top 1, Top 2, and Top 3):
+
+        # 🥇 Top [1/2/3]: [Paper Title]
+        [Dynamic Tag 1] [Dynamic Tag 2] #ArxivHunter
         
-        Required Output Structure (Repeat this block for all 3 papers):
-        
-        # 🥇 Top 1: [Paper Title]
-        #EmbodiedAI #ArxivHunter
-        
-        > [!info] Meta Data
+        > [!info] 🎯 Target Locked
         > **Authors:** [Authors]
         > **Link:** [Insert URL here - Crucial for Zotero!]
-        > **Why Top 1:** [1-2 sentences on why this is the best paper today.]
+        > **Why this one, bro?:** [1-2 sentence, enthusiastic justification for why you picked this specific paper today.]
         
-        > [!summary] Core Innovation & Architecture
-        > [Deep dive: Explain the model architecture, the math/logic behind it, and what makes it structurally novel. Use accessible but highly technical language.]
+        > [!summary] 💡 Core Innovation
+        > [CRITICAL LENGTH: Write 2-3 substantial paragraphs here. Strip away the academic jargon. Explain the underlying mechanics, the math/logic, and what specific problem it solves in plain, friendly language (as if explaining it over a cup of coffee), while maintaining extreme technical depth.]
         
-        > [!example] Real-world Impact & Limitations
-        > [Where can this be deployed? What are the bottleneck or limitations the authors aren't saying loudly?]
+        > [!example] 📈 Value Assessment & Future Prospects
+        > [CRITICAL LENGTH: Write a highly detailed paragraph. What is the future impact of this technology? How can this be applied in real-world robotics or AI industry scenarios?]
+        
+        > [!quote] 🧠 Professor's Deep Dive
+        > [CRITICAL LENGTH: Write a highly detailed paragraph. Provide your critical, independent thought on this paper. Is there a hidden flaw? Is it a game-changer or just an incremental update? Keep the tone sharp but peer-to-peer.]
         
         ---
-        (Then do 🥈 Top 2 and 🥉 Top 3 following the exact same structure).
         """
         
         try:
             response = self.llm_client.chat.completions.create(
-                model="glm-4", # Note: using glm-4 as base endpoint per standard, but it routes to the latest model
+                model="glm-5", # Note: using glm-5 as base endpoint per standard, but it routes to the latest model
                 messages=[
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": f"Context Payload:\n{payload}"}
                 ],
-                temperature=0.4, 
+                temperature=1.0, 
                 extra_body={"thinking": {"type": "enabled"}} 
             )
             
@@ -132,10 +134,18 @@ class ArxivHunter:
         if not os.path.exists(vault_path):
             os.makedirs(vault_path)
             
-        # Generate a dynamic filename based on today's date
+        # --- V3.1.6 Auto-Increment Filename System ---
         today_str = datetime.date.today().strftime("%Y-%m-%d")
-        filename = f"Arxiv_Hunter_{today_str}.md"
-        full_path = os.path.join(vault_path, filename)
+        
+        # 碰撞检测循环：从 1 开始试，如果有重复的就 +1，直到找到空位
+        counter = 1
+        while True:
+            filename = f"Arxiv_Hunter_{today_str}_{counter}.md"
+            full_path = os.path.join(vault_path, filename)
+            if not os.path.exists(full_path):
+                break  # 找到没人占用的名字了，跳出循环！
+            counter += 1
+        # ----------------------------------------------
         
         try:
             with open(full_path, "w", encoding="utf-8") as f:
@@ -159,22 +169,28 @@ class ArxivHunter:
             today_str = datetime.date.today().strftime("%Y-%m-%d")
             msg['Subject'] = f"🤖 Arxiv Hunter Alert: Embodied AI ({today_str})"
 
-            # --- THE TEXT SLICER (Pure Python, No pip needed) ---
-            # 1. Clean up the messy Obsidian tags to make it plain-text friendly
-            clean_text = content.replace("> [!info] Target Locked", "🎯 [TARGET LOCKED]")
-            clean_text = clean_text.replace("> [!summary] Core Innovation (The \"Bro, what does this actually do?\" Section)", "\n💡 [CORE INNOVATION]")
-            clean_text = clean_text.replace("> [!example] Value Assessment & Future Prospects", "\n📈 [VALUE PROSPECTS]")
-            clean_text = clean_text.replace("> [!quote] Professor's Deep Dive", "\n🧠 [DEEP DIVE]")
-            clean_text = clean_text.replace("> ", "") # Remove blockquote arrows
+            # --- THE TEXT SLICER V3.1.5 (Full Content, No Truncation) ---
+            import re
+            clean_text = content
             
-            # 2. Slice the content to make it shorter for the email (Optional refinement)
-            # We will split the text and drop the heavy "Deep Dive" section for the quick email read.
-            if "🧠 [DEEP DIVE]" in clean_text:
-                short_email_text = clean_text.split("🧠 [DEEP DIVE]")[0]
-                short_email_text += "\n\n(For the Professor's Full Deep Dive, check your Obsidian Vault!)"
-            else:
-                short_email_text = clean_text
-            # ----------------------------------------------------
+            # 1. Regex Translation: 完美同步你 Prompt 里的极客文案和 Emoji
+            clean_text = re.sub(r'> \[!info\].*', '🎯 [TARGET LOCKED]', clean_text)
+            clean_text = re.sub(r'> \[!summary\].*', '💡 [CORE INNOVATION]', clean_text)
+            clean_text = re.sub(r'> \[!example\].*', '📈 [VALUE ASSESSMENT & PROSPECTS]', clean_text)
+            clean_text = re.sub(r'> \[!quote\].*', '🧠 [PROFESSOR\'S DEEP DIVE]', clean_text)
+            
+            # 2. 扒掉剩下正文内容的 blockquote 箭头
+            clean_text = clean_text.replace("> ", "")
+            
+            # 3. Dynamic Subject Line Update
+            try:
+                first_tag = re.search(r'#(\w+)', content).group(1)
+            except:
+                first_tag = "Latest Research"
+            msg['Subject'] = f"🤖 Arxiv Hunter [{first_tag}]: {today_str}"
+
+            # 4. 彻底移除截断逻辑！直接将满血清洗后的三篇完整长文塞进邮件！
+            short_email_text = clean_text
 
             # Attach the clean, shortened text
             msg.attach(MIMEText(short_email_text, 'plain', 'utf-8'))
