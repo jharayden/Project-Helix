@@ -130,9 +130,9 @@ class ArxivHunter:
         """
         print(f"\n[ORCHESTRATOR] Initiating Phase 4: Writing telemetry to local vault...")
         
-        # Ensure the directory exists
-        if not os.path.exists(vault_path):
-            os.makedirs(vault_path)
+        # V3.5 Routing: 自动在大文件夹下创建 'Arxiv_Papers' 专属子文件夹
+        target_dir = os.path.join(vault_path, "Arxiv_Papers")
+        os.makedirs(target_dir, exist_ok=True)
             
         # --- V3.1.6 Auto-Increment Filename System ---
         today_str = datetime.date.today().strftime("%Y-%m-%d")
@@ -141,7 +141,8 @@ class ArxivHunter:
         counter = 1
         while True:
             filename = f"Arxiv_Hunter_{today_str}_{counter}.md"
-            full_path = os.path.join(vault_path, filename)
+            # 注意：这里的路径拼接换成了 target_dir
+            full_path = os.path.join(target_dir, filename) 
             if not os.path.exists(full_path):
                 break  # 找到没人占用的名字了，跳出循环！
             counter += 1
