@@ -1,75 +1,90 @@
-# 🎯 Arxiv Hunter: The Autonomous AI Research Agent
+# 🧬 Project Helix: The Autonomous AI Intelligence Suite
 
-![Version](https://img.shields.io/badge/Version-3.1.6-blue.svg?style=for-the-badge)
+![Version](https://img.shields.io/badge/Version-3.5.0-blue.svg?style=for-the-badge)
 ![Python](https://img.shields.io/badge/Python-3.10+-yellow.svg?style=for-the-badge)
 ![Brain](https://img.shields.io/badge/Brain-GLM--5-purple.svg?style=for-the-badge)
 ![Deployment](https://img.shields.io/badge/Cloud-GitHub_Actions-2088FF.svg?style=for-the-badge&logo=github)
 
-**Arxiv Hunter** is a highly opinionated, autonomous intelligence agent designed to solve the "academic noise" problem. It wakes up every day at an off-peak custom time via CRON (e.g., 6:17 AM Beijing Time), scans the Arxiv database for the latest papers in your specific field (e.g., Embodied AI), uses the **GLM-5** cognitive engine to deeply evaluate them, and dispatches a highly readable, "Geek Professor" style report directly to your **Email** and **Obsidian Vault** before you even brew your morning coffee.
+Welcome to **Project Helix**. This is no longer just a paper reader; it is a **Dual-Strand Autonomous Microservice System** designed to extract pure signal from the noise of both academic research and open-source engineering. 
 
-Stop scrolling through abstract feeds. Let the Agent hunt the signal for you.
+It runs entirely on GitHub Actions (Zero server costs) and dispatches highly readable, CTO-level briefings directly to your Email and Obsidian Vault.
 
----
+- 🌅 **Strand A (The Morning Track - `hunter.py`):** Scans the Arxiv database for the latest papers. The "Geek Professor" agent evaluates them and delivers the Top 3 theoretical breakthroughs.
+- 🌃 **Strand B (The Nightly Track - `githuber.py`):** Scans the GitHub API for the fastest-growing AI repositories. The "Silicon Valley CTO" agent evaluates the commercial value and developer friction of the Top 1 "Lobster" (killer app).
 
-## 🚀 Key Features (V3.1.6 Arsenal)
-
-- **🧠 Full-Depth Cognitive Engine (GLM-5):** Adopts a "Professor/Bro" persona—technical expertise meets friendly peer. Utilizing strict **Anti-Laziness Prompt Engineering**, it guarantees exactly Top 3 papers per run, ensuring non-truncated, substantial analysis (2-3 thick paragraphs per section) for *every* selected paper.
-- **🛡️ Hardcoded Proxy Bypass:** Executes `os.environ["NO_PROXY"] = "*"` at launch. This completely blinds Python to underlying system/registry proxy configurations (crucial for Windows hosts), ensuring bulletproof API request stability.
-- **📡 Dual-Dispatch Slicer (Regex-Powered):**
-  - **Vault Mode:** Outputs raw, beautifully formatted Obsidian Markdown utilizing custom Callouts (`> [!info] 🎯 Target Locked`) and dynamic, content-aware `#Tags`.
-  - **Email Mode:** Features a bulletproof Regex Text Slicer V3.1.5 that translates complex Obsidian syntax into clean, readable plain text on the fly. It now dispatches the **FULL** content of all three papers (including full Professor's Deep Dives) to your inbox with no truncation.
-- **🗂️ Collision-Free Storage System:** Implements an auto-incrementing local file storage logic (`Arxiv_Hunter_YYYY-MM-DD_N.md`). No matter how many times you trigger the agent per day via web or terminal, historical data is never overwritten.
+Stop scrolling through abstract feeds. Let Helix hunt the signal for you.
 
 ---
 
-## ⚙️ Architecture Workflow
+## 🚀 The Core DNA (V3.5 Arsenal)
 
-1. **[SENSORS] Target Acquisition:** Queries Arxiv API based on the dynamic `TARGET_TOPIC`. Extracts Title, Authors, Abstract, and direct entries IDs for Zotero integration.
-2. **[COGNITIVE] Deep Evaluation:** Sends the payload to GLM-5. The model executes Top 3 selection based on strict structural and impact constraints, maintaining extreme technical depth.
-3. **[STORAGE] Vault Write:** Performs collision detection on the local file system and saves the raw Obsidian Markdown via auto-incrementing filenames.
-4. **[DISPATCH] Email Translation:** The Regex engine sanitizes the text, updates the email subject dynamically based on the paper's tags, and transmits full intelligence via SMTP.
+- **🧠 Dual Cognitive Engines (GLM-5):** - *The Professor (Arxiv):* Evaluates academic novelty and methodology.
+  - *The CTO (GitHub):* Answers the "Soul Questions" - What is it? What's the commercial value? How hard is it to deploy? What's the ideal workflow?
+- **📡 The Velocity Engine (GitHub Radar):** Bypasses static "Total Stars" metrics. Calculates the real-time growth velocity (`Stars / Hours Alive`) to capture exploding repositories before they hit the mainstream.
+- **🗂️ Smart Storage Routing:** Automatically creates `Arxiv_Papers` and `GitHuber` subfolders inside your Obsidian Vault. Implements collision-free file naming (`Catch_YYYY-MM-DD_N.md`).
+- **📨 Regex Text Slicer:** Automatically strips heavy Obsidian Callout syntax (`> [!info]`) in memory, translating the payload into a beautifully clean, plain-text email for mobile reading.
+- **🛡️ Bulletproof Execution:** Hardcoded proxy bypasses (`NO_PROXY="*"`) for Windows environments, and SMTP hostname masking (`localhost`) to prevent GBK/UTF-8 decoding crashes on local machines.
 
 ---
 
-## 🛠️ Quick Start (Deploy Your Own Hunter)
+## 🛠️ Installation & Deployment (Foolproof Guide)
 
-### 1. Local Environment Setup
-Clone the repo and install the minimal dependencies:
+### Step 1: Clone & Install Dependencies
+Get the code onto your local machine:
 ```bash
-git clone [https://github.com/yourusername/arxiv-hunter.git](https://github.com/yourusername/arxiv-hunter.git)
-cd arxiv-hunter
-pip install arxiv openai python-dotenv
+git clone [https://github.com/yourusername/project-helix.git](https://github.com/yourusername/project-helix.git)
+cd project-helix
+pip install arxiv openai python-dotenv requests
 ```
 
-### 2. Configure the Vault (Secrets)
-Create a `.env` file in the root directory and add your credentials:
+### Step 2: Configure the Vault (The `.env` File)
+Create a `.env` file in the root directory. This is your vault for API keys. **Never commit this file to public repositories.**
+
 ```env
-GLM_API_KEY="your_zhipu_api_key_here"
-OBSIDIAN_PATH="C:/Users/YourName/Documents/Obsidian Vault/AI_Research"
+# Cognitive Engine
+GLM_API_KEY="your_zhipu_glm_api_key_here"
+
+# Storage Routing (Use absolute paths)
+OBSIDIAN_PATH="D:/obsidian/vault/PROJECT_HELIX" 
+
+# Email Dispatch
 SENDER_EMAIL="your_bot_email@163.com"
-EMAIL_PASSWORD="your_smtp_app_password"
+EMAIL_PASSWORD="your_smtp_app_password" # Use App Password, NOT your real password
 RECEIVER_EMAIL="your_personal_email@gmail.com"
-TARGET_TOPIC="Embodied AI" # Default fallback
+
+# Strand A: Arxiv Targeting
+TARGET_TOPIC="Embodied AI"
+
+# Strand B: GitHub Radar (Optional, prevents API rate limiting)
+GITHUB_TOKEN="your_classic_github_personal_access_token"
 ```
 
-### 3. Configure the Autopilot (CRON)
-Open `.github/workflows/daily_hunt.yml` and set your preferred off-peak hunting time. **Pro Tip:** Avoid exact hours like `0 0 * * *` to bypass GitHub Actions traffic jams. Use offset times like `17 22 * * *`.
+### Step 3: Local Ignition (Testing)
+Before going to the cloud, test both engines locally. The scripts will automatically create subfolders in your Obsidian path and fire off emails.
 
-### 4. Ignite the Engine
-Run the agent manually to test the full pipeline:
 ```bash
+# Run Strand A (Morning Paper Agent)
 python hunter.py
+
+# Run Strand B (Nightly GitHub Agent)
+python githuber.py
 ```
+
+### Step 4: Cloud Autopilot (GitHub Actions)
+To make this run automatically every day for free:
+1. Go to your GitHub Repository -> **Settings** -> **Secrets and variables** -> **Actions**.
+2. Add all the keys from your `.env` file as **Repository Secrets** (e.g., `GLM_API_KEY`, `SENDER_EMAIL`, etc.).
+3. The agents are scheduled via `.github/workflows/daily_hunt.yml` and `.github/workflows/githuber.yml`. They are pre-configured to run at off-peak hours to avoid GitHub's server queues. You can adjust the `cron` timings inside those files if needed.
 
 ---
 
 ## 🗺️ Roadmap
 
 - [x] **V2.0:** Base LLM integration, SMTP setup, and daily automation via Actions.
-- [x] **V3.1.6:** Professor Persona, Bulletproof Regex Email Slicer (full text), Zero-Overwrite Storage, Zotero link extraction, Proxy Bypass.
-- [ ] **V3.5 (Upcoming):** `GitHub Trend Hunter` - Expanding sensors to scrape and deeply evaluate daily trending open-source AI repositories.
-- [ ] **V3.5.1 (Upcoming):** `Better UI` - Enhancing the design and user experience of the Web UI, expand the ability of the Web UI, adding cool animation effects.
+- [x] **V3.1.6:** Professor Persona, Regex Email Slicer, Collision-Free Storage.
+- [x] **V3.5.0:** **Project Helix (Dual-Strand Microservices)**, Velocity Radar, CTO Persona, Smart Folder Routing.
+- [ ] **V3.6 (Upcoming):** `Better UI` - Enhancing the design and user experience of the local Streamlit Web UI.
 - [ ] **V4.0 (The Vision):** Complete front-end/back-end separation. FastAPI driven backend with a fully interactive, WebGL-powered 3D Dashboard driven by AI state.
 
 ---
-*Built with excessive amounts of coffee and a refusal to read bad papers manually.*
+*Built with excessive amounts of coffee, zero sleep, and a refusal to read bad papers manually.*
