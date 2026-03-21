@@ -18,7 +18,8 @@ Stop scrolling through abstract feeds. Let Helix hunt the signal for you.
 
 ## 🚀 The Core DNA (V3.5 Arsenal)
 
-- **🧠 Dual Cognitive Engines (GLM-5):** - *The Professor (Arxiv):* Evaluates academic novelty and methodology.
+- **🧠 Dual Cognitive Engines (GLM-5):**
+  - *The Professor (Arxiv):* Evaluates academic novelty and methodology.
   - *The CTO (GitHub):* Answers the "Soul Questions" - What is it? What's the commercial value? How hard is it to deploy? What's the ideal workflow?
 - **📡 The Velocity Engine (GitHub Radar):** Bypasses static "Total Stars" metrics. Calculates the real-time growth velocity (`Stars / Hours Alive`) to capture exploding repositories before they hit the mainstream.
 - **🗂️ Smart Storage Routing:** Automatically creates `Arxiv_Papers` and `GitHuber` subfolders inside your Obsidian Vault. Implements collision-free file naming (`Catch_YYYY-MM-DD_N.md`).
