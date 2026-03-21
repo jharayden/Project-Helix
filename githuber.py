@@ -28,21 +28,26 @@ class GitHuber:
             raise ValueError("[FATAL] GLM_API_KEY not found in .env file.")
         self.client = OpenAI(api_key=api_key, base_url="https://open.bigmodel.cn/api/paas/v4/")
 
-    def hunt_top_lobster(self) -> Dict[str, Any]:
+    def hunt_top_lobster(self, query: str = "") -> Dict[str, Any]: # [NEW] 加入 query 参数，默认是空字符串
         """
-        Phase 1: Sensor Layer. Scans for new repos in the last 7 days, 
+        Phase 1: Sensor Layer. Scans for new repos in the last 7 days,
         calculates velocity, and locks onto the Top 1.
         """
         print("\n[SENSOR LAYER] Scanning GitHub for the fastest-growing 'Lobster' in the last 7 days...")
-        
+
         now = datetime.datetime.now(datetime.timezone.utc)
         seven_days_ago = (now - datetime.timedelta(days=7)).strftime('%Y-%m-%d')
-        
-        query = f"created:>{seven_days_ago} ai OR agent OR automation OR plugin OR workflow"
-        
+
+        # [NEW] 核心兼容逻辑：有词就搜词，没词就按老规矩自动抽卡！
+        if query:
+            final_query = f"created:>{seven_days_ago} {query}"
+            print(f"[SENSOR LAYER] Target Override: Hunting for '{query}'...")
+        else:
+            final_query = f"created:>{seven_days_ago} ai OR agent OR automation OR plugin OR workflow"
+
         url = "https://api.github.com/search/repositories"
         params = {
-            "q": query,
+            "q": final_query,
             "sort": "stars",
             "order": "desc",
             "per_page": 30
