@@ -1,33 +1,33 @@
-name: GitHuber (Nightly)
+name: Autonomous Daily Hunter
 
 on:
   schedule:
-    # 终极错峰时间：UTC 11:43 (日本时间 20:43)。避开所有整点排队大军！
-    - cron: '43 11 * * *'
-  workflow_dispatch: # 允许你在 GitHub 网页上手动点火
+    - cron: '17 22 * * *'
+  workflow_dispatch: 
 
 jobs:
   execute-hunt:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # 使用 GitHub 免费提供的超级 Linux 服务器
 
     steps:
       - name: 📥 Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4 # [升级到 v4]
 
       - name: ⚙️ Setup Python 3.10 Engine
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5 # [升级到 v5]
         with:
           python-version: '3.10'
+          cache: 'pip' # [新增] 缓存依赖，让启动速度快 3 倍
 
       - name: ⛽ Inject Fuel (Install Dependencies)
         run: pip install -r requirements.txt
 
-      - name: 🚀 IGNITION! (Run GitHuber)
-        env:
+      - name: 🚀 IGNITION! (Run Agent)
+        env: 
           GLM_API_KEY: ${{ secrets.GLM_API_KEY }}
           SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
           EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
           RECEIVER_EMAIL: ${{ secrets.RECEIVER_EMAIL }}
-          OBSIDIAN_PATH: "./"
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: python githuber.py
+          TARGET_TOPIC: ${{ vars.TARGET_TOPIC }} 
+          OBSIDIAN_PATH: "./" 
+        run: python hunter.py

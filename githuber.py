@@ -198,46 +198,69 @@ class GitHuber:
             
     def save_to_vault(self, report: str) -> None:
         """
-        Phase 3a: Storage Layer. Saves the raw Obsidian Markdown locally
-        into a dedicated 'GitHuber' subfolder with collision-free filenames.
+        Phase 3a: Storage Layer. 
+        V3.6 APN Protocol: Absolute Path Lockdown & Collision-free filenames.
         """
+        from pathlib import Path
+        import datetime
+        import os
+
         print("\n[STORAGE LAYER] Saving payload to Obsidian Vault...")
+        
         base_vault_path = os.getenv("OBSIDIAN_PATH")
-        if not base_vault_path or not os.path.exists(base_vault_path):
-            print("[ERROR] OBSIDIAN_PATH is invalid or missing in .env.")
-            return
+        
+        # 1. Absolute Path Resolution
+        if base_vault_path:
+            base_dir = Path(base_vault_path).resolve()
+        else:
+            print("[WARNING] OBSIDIAN_PATH missing or invalid. Defaulting to local Vault.")
+            base_dir = Path(__file__).resolve().parent / "Vault"
+            
+        target_dir = base_dir / "GitHuber"
+        
+        try:
+            target_dir.mkdir(parents=True, exist_ok=True)
+        except Exception as e:
+            print(f"[ERROR] Path Resolution Failed! Cannot create directory at {target_dir}: {e}")
+            raise # Stop execution chain if disk write is impossible
 
-        # V3.5 Routing: 自动在大文件夹下创建 'GitHuber' 专属子文件夹
-        target_dir = os.path.join(base_vault_path, "GitHuber")
-        os.makedirs(target_dir, exist_ok=True)
-
+        # 2. Auto-Increment Filename System
         today_str = datetime.date.today().strftime("%Y-%m-%d")
         counter = 1
         while True:
             filename = f"GitHuber_Catch_{today_str}_{counter}.md"
-            full_path = os.path.join(target_dir, filename) # 存入专属子文件夹
-            if not os.path.exists(full_path):
+            full_path = target_dir / filename
+            if not full_path.exists():
                 break
             counter += 1
 
+        # 3. Atomic Persistence
         try:
             with open(full_path, "w", encoding="utf-8") as f:
                 f.write(report)
             print(f"[STORAGE LAYER] Success! Saved to: {full_path}")
         except Exception as e:
             print(f"[ERROR] Failed to save to Vault: {e}")
+            raise # Re-raise for APN routing trace
 
-    def dispatch_email(self, report: str, repo_name: str) -> None:
+    def send_email(self, report: str, repo_name: str) -> None:
         """
-        Phase 3b: Dispatch Layer. Slices the Obsidian syntax and emails the payload.
+        Phase 3b: Dispatch Layer. 
+        V3.6: Renamed to match API contract. Slices Obsidian syntax and dispatches.
         """
+        import os
+        import re
+        import smtplib
+        from email.mime.text import MIMEText
+        from email.mime.multipart import MIMEMultipart
+
         print("\n[DISPATCH LAYER] Initializing Text Slicer and SMTP transmission...")
         sender = os.getenv("SENDER_EMAIL")
         password = os.getenv("EMAIL_PASSWORD")
         receiver = os.getenv("RECEIVER_EMAIL")
 
         if not all([sender, password, receiver]):
-            print("[ERROR] Email credentials missing in .env.")
+            print("[ERROR] Email credentials missing in .env. Aborting dispatch.")
             return
 
         # Regex Slicer: Strip Obsidian callout syntax for clean plain text emails
@@ -252,8 +275,7 @@ class GitHuber:
         msg.attach(MIMEText(sliced_text, 'plain', 'utf-8'))
 
         try:
-            # FIXED: Added local_hostname="localhost" to bypass Windows GBK/UTF-8 decoding 
-            # errors if the machine's hostname contains Chinese characters.
+            # Bypass Windows GBK/UTF-8 decoding errors with local_hostname
             server = smtplib.SMTP_SSL("smtp.163.com", 465, local_hostname="localhost") 
             server.login(sender, password)
             server.sendmail(sender, receiver, msg.as_string())
@@ -261,24 +283,50 @@ class GitHuber:
             print("[DISPATCH LAYER] Payload successfully delivered to inbox!")
         except Exception as e:
             print(f"[ERROR] SMTP Transmission failed: {e}")
+            raise # Propagate error for APN visibility
     
 
-# Replace your current testing probe at the bottom with this final execution block
 if __name__ == "__main__":
+    # --- 1. SYSTEM CONFIGURATION ---
+    # Ensure environment is loaded when running standalone
+    load_dotenv()
+    
     githuber = GitHuber()
+    target_topic = os.getenv("TARGET_TOPIC", "") # Optional manual override
     
-    # Phase 1: Hunt
-    lobster = githuber.hunt_top_lobster()
+    print("\n--- INITIATING GITHUB LOBSTER HUNT SEQUENCE ---")
     
-    if lobster:
+    # --- 2. THE ATOMIC APN LOOP ---
+    try:
+        # Phase 1: Hunt
+        lobster = githuber.hunt_top_lobster(query=target_topic)
+        
+        if not lobster:
+            raise Exception("Sensor Layer failed to lock onto a valid target.")
+            
         # Phase 2: Evaluate
         report = githuber.evaluate_lobster(lobster)
         
-        if report and not report.startswith("> [!error]"):
-            print("\n" + "="*50)
-            print("🚀 FINAL CTO REPORT GENERATED 🚀")
-            print("="*50)
-            
-            # Phase 3: Action (Save & Send)
+        if not report or report.startswith("> [!error]"):
+            raise Exception("Cognitive Layer (CTO Engine) returned an error block.")
+
+        print("\n" + "="*50)
+        print("🚀 FINAL CTO REPORT GENERATED 🚀")
+        print("="*50)
+
+        # Phase 3a: Vault Persistence
+        try:
             githuber.save_to_vault(report)
-            githuber.dispatch_email(report, lobster['name'])
+        except Exception as e:
+            print(f"[HELIX_WARNING] Local Persistence Failed: {e}")
+            
+        # Phase 3b: Network Dispatch
+        try:
+            githuber.send_email(report=report, repo_name=lobster['name'])
+        except Exception as e:
+            print(f"[HELIX_WARNING] Network Dispatch Failed: {e}")
+
+        print("\n[SYSTEM] GitHuber APN routine complete. Mission Accomplished. Entering standby.")
+        
+    except Exception as fatal_error:
+        print(f"\n[CRITICAL FAILURE] GitHuber hunt sequence aborted: {fatal_error}")

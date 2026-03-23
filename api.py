@@ -39,53 +39,86 @@ async def health_check():
     """
     return {"status": "Helix Backend Online", "code": 200}
 
-@app.post("/api/arxiv/ignite") # [RENAMED] Strand A -> Arxiv
+@app.post("/api/arxiv/ignite")
 async def trigger_arxiv_hunter(request: HuntRequest):
     """
-    Morning Academic Radar (Arxiv)
+    Morning Academic Radar (Arxiv) - APN Protocol Enabled
     """
     try:
+        actual_topic = request.target_topic.strip()
+        if not actual_topic:
+            actual_topic = os.getenv("TARGET_TOPIC")
         api_key = os.getenv("GLM_API_KEY")
         obsidian_path = os.getenv("OBSIDIAN_PATH")
         
         hunter = ArxivHunter(glm_api_key=api_key)
+        
+        # 1. GENERATE: Execute LLM Pipeline
         papers = hunter.hunt_papers(query=request.target_topic, max_results=10)
         report = hunter.digest_papers(papers=papers)
         
-        if report and not report.startswith("> [!error]"):
+        if not report or report.startswith("> [!error]"):
+            raise HTTPException(status_code=500, detail="Cognitive Layer Misfire: Failed to generate report.")
+
+        # 2. SAVE: Persist to Obsidian Vault (Atomic Step 1)
+        try:
             hunter.save_report(content=report, vault_path=obsidian_path)
-            return {"status": "success", "payload": report}
-        else:
-            raise HTTPException(status_code=500, detail="Cognitive Layer Misfire.")
+            print("[HELIX_ROUTING] Successfully saved Arxiv report to Vault.")
+        except Exception as e:
+            print(f"[HELIX_ERROR] Vault Persistence Failed: {e}")
+            # We don't block the email if Vault fails, but we log it heavily.
+
+        # 3. DISPATCH: Send SMTP Email (Atomic Step 2)
+        try:
+            # Assuming your ArxivHunter has a method for email. Adjust method name if needed.
+            hunter.send_email(report) 
+            print("[HELIX_ROUTING] Successfully dispatched Arxiv SMTP email.")
+        except Exception as e:
+            print(f"[HELIX_ERROR] SMTP Dispatch Failed: {e}")
+
+        return {"status": "success", "payload": report}
             
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=f"Arxiv Pipeline Error: {str(e)}")
 
 @app.post("/api/github/ignite") 
-async def trigger_github_radar(request: HuntRequest): # [NEW] 1. 接收前端传来的 request (包含关键词)
+async def trigger_github_radar(request: HuntRequest):
     """
-    Nightly Open-Source Radar (GitHub) - Targeted Search Enabled
+    Nightly Open-Source Radar (GitHub) - APN Protocol Enabled
     """
     try:
+        actual_topic = request.target_topic.strip()
         githuber = GitHuber()
         
-        # [NEW] 2. 将前端传来的关键词 (target_topic)，喂给寻龙虾引擎！
-        # 注意：这里我们传入了 query 参数
-        lobster = githuber.hunt_top_lobster(query=request.target_topic) 
-        
+        # 1. TARGET & GENERATE
+        lobster = githuber.hunt_top_lobster(query=actual_topic) 
         if not lobster:
             raise HTTPException(status_code=404, detail="No targets locked for this sector.")
             
         report = githuber.evaluate_lobster(lobster)
         
-        if report and not report.startswith("> [!error]"):
+        if not report or report.startswith("> [!error]"):
+            raise HTTPException(status_code=500, detail="CTO Engine Misfire: Evaluation failed.")
+
+        # 2. SAVE: Persist to Obsidian Vault (Atomic Step 1)
+        try:
             githuber.save_to_vault(report)
-            return {"status": "success", "target": lobster["name"], "payload": report}
-        else:
-            raise HTTPException(status_code=500, detail="CTO Engine Misfire.")
+            print(f"[HELIX_ROUTING] Successfully saved Lobster '{lobster['name']}' to Vault.")
+        except Exception as e:
+            print(f"[HELIX_ERROR] Vault Persistence Failed for GitHuber: {e}")
+
+        # 3. DISPATCH: Send SMTP Email (Atomic Step 2)
+        try:
+            # Assuming your GitHuber has a method for email. Adjust method name if needed.
+            githuber.send_email(report, lobster["name"]) 
+            print(f"[HELIX_ROUTING] Successfully dispatched GitHub SMTP email for '{lobster['name']}'.")
+        except Exception as e:
+            print(f"[HELIX_ERROR] SMTP Dispatch Failed for GitHuber: {e}")
+
+        return {"status": "success", "target": lobster["name"], "payload": report}
             
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=f"GitHub Pipeline Error: {str(e)}")
 
 @app.get("/api/vault/list") # [NEW ENDPOINT] To list files
 async def list_vault_files():
@@ -135,10 +168,12 @@ async def read_vault_file(path: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 # --- [NEW] SYNAPSE CHAT ENGINE ---
+from typing import Optional # 如果没有导包，记得在文件最上面加一下
+
 class ChatRequest(BaseModel):
     message: str
-    history: list = []
-    context_path: str = None
+    history: list
+    context_path: Optional[str] = None  # <--- 改成这行！允许它为空！(或者写 context_path: str | None = None)
 
 @app.post("/api/chat")
 async def helix_chat(request: ChatRequest):

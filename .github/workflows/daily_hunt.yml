@@ -2,7 +2,6 @@ name: Autonomous Daily Hunter
 
 on:
   schedule:
-    
     - cron: '17 22 * * *'
   workflow_dispatch: 
 
@@ -12,22 +11,23 @@ jobs:
 
     steps:
       - name: 📥 Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4 # [升级到 v4]
 
       - name: ⚙️ Setup Python 3.10 Engine
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5 # [升级到 v5]
         with:
           python-version: '3.10'
+          cache: 'pip' # [新增] 缓存依赖，让启动速度快 3 倍
 
       - name: ⛽ Inject Fuel (Install Dependencies)
         run: pip install -r requirements.txt
 
       - name: 🚀 IGNITION! (Run Agent)
-        env: # 从云端保险箱提取机密
+        env: 
           GLM_API_KEY: ${{ secrets.GLM_API_KEY }}
           SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
           EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
           RECEIVER_EMAIL: ${{ secrets.RECEIVER_EMAIL }}
-          TARGET_TOPIC: ${{ vars.TARGET_TOPIC }} # <--- V2.1 新增：允许用户在 GitHub Variables 中配置专属主题
+          TARGET_TOPIC: ${{ vars.TARGET_TOPIC }} 
           OBSIDIAN_PATH: "./" 
         run: python hunter.py

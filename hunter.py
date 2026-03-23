@@ -124,80 +124,100 @@ class ArxivHunter:
             print(f"[ERROR] Cognitive Layer misfire: {e}")
             return f"> [!error] System Failure during Cognitive processing: {e}"
 
-    def save_report(self, content: str, vault_path: str) -> None:
+    def save_report(self, content: str, vault_path: str = None) -> None:
         """
         Phase 4: Report. Writes the synthesized AI response to the local file system.
+        V3.6 APN Protocol: Absolute Path Lockdown.
         """
+        from pathlib import Path
+        import datetime
+        
         print(f"\n[ORCHESTRATOR] Initiating Phase 4: Writing telemetry to local vault...")
         
-        # V3.5 Routing: 自动在大文件夹下创建 'Arxiv_Papers' 专属子文件夹
-        target_dir = os.path.join(vault_path, "Arxiv_Papers")
-        os.makedirs(target_dir, exist_ok=True)
+        # 1. Absolute Path Resolution (The Ironclad Fix)
+        if vault_path:
+            # Force resolve any relative strings (like '../Vault') to absolute paths
+            base_dir = Path(vault_path).resolve()
+        else:
+            # Fallback: Create a 'Vault' folder next to this exact python script
+            base_dir = Path(__file__).resolve().parent / "Vault"
             
-        # --- V3.1.6 Auto-Increment Filename System ---
-        today_str = datetime.date.today().strftime("%Y-%m-%d")
+        target_dir = base_dir / "Arxiv_Papers"
         
-        # 碰撞检测循环：从 1 开始试，如果有重复的就 +1，直到找到空位
+        try:
+            target_dir.mkdir(parents=True, exist_ok=True)
+        except Exception as e:
+            print(f"[ERROR] Path Resolution Failed! Cannot create directory at {target_dir}: {e}")
+            raise # Stop execution chain if disk write is impossible
+            
+        # 2. Auto-Increment Filename System
+        today_str = datetime.date.today().strftime("%Y-%m-%d")
         counter = 1
         while True:
             filename = f"Arxiv_Hunter_{today_str}_{counter}.md"
-            # 注意：这里的路径拼接换成了 target_dir
-            full_path = os.path.join(target_dir, filename) 
-            if not os.path.exists(full_path):
-                break  # 找到没人占用的名字了，跳出循环！
+            full_path = target_dir / filename 
+            if not full_path.exists():
+                break  
             counter += 1
-        # ----------------------------------------------
         
+        # 3. Atomic Persistence
         try:
             with open(full_path, "w", encoding="utf-8") as f:
                 f.write(content)
             print(f"[ORCHESTRATOR] SUCCESS! Report securely saved to: {full_path}")
         except Exception as e:
             print(f"[ERROR] Action Layer failed to write file: {e}")
+            raise # Re-raise for APN routing trace
 
-    def dispatch_email(self, content: str, sender_email: str, app_password: str, receiver_email: str, smtp_server: str, smtp_port: int = 465) -> None:
+    def send_email(self, content: str) -> None:
         """
-        Phase 4 (Action B): Deterministic SMTP client. 
-        Zero dependencies. Cleans and slices the content for a quick email read.
+        Phase 4 (Action B): Deterministic SMTP client.
+        V3.6: Self-contained credential fetching. Zero parameter bloat.
         """
+        import smtplib
+        import re
+        import datetime
+        from email.mime.text import MIMEText
+        from email.mime.multipart import MIMEMultipart
+        import os
+        
         print(f"\n[ORCHESTRATOR] Initiating Phase 4 (Action B): Slicing text for email dispatch...")
         
+        # Securely fetch credentials internally
+        sender_email = os.getenv("SENDER_EMAIL")
+        app_password = os.getenv("EMAIL_PASSWORD")
+        receiver_email = os.getenv("RECEIVER_EMAIL")
+        smtp_server = os.getenv("SMTP_SERVER", "smtp.163.com")
+        
+        if not all([sender_email, app_password, receiver_email]):
+            print("[ERROR] Missing SMTP credentials in .env! Aborting dispatch.")
+            return
+
         try:
             msg = MIMEMultipart()
             msg['From'] = sender_email
             msg['To'] = receiver_email
             
             today_str = datetime.date.today().strftime("%Y-%m-%d")
-            msg['Subject'] = f"🤖 Arxiv Hunter Alert: Embodied AI ({today_str})"
-
-            # --- THE TEXT SLICER V3.1.5 (Full Content, No Truncation) ---
-            import re
-            clean_text = content
             
-            # 1. Regex Translation: 完美同步你 Prompt 里的极客文案和 Emoji
+            # --- THE TEXT SLICER V3.1.5 ---
+            clean_text = content
             clean_text = re.sub(r'> \[!info\].*', '🎯 [TARGET LOCKED]', clean_text)
             clean_text = re.sub(r'> \[!summary\].*', '💡 [CORE INNOVATION]', clean_text)
-            clean_text = re.sub(r'> \[!example\].*', '📈 [VALUE ASSESSMENT & PROSPECTS]', clean_text)
+            clean_text = re.sub(r'> \[!example\].*', '📈 [VALUE ASSESSMENT & PROSPEcripts]', clean_text)
             clean_text = re.sub(r'> \[!quote\].*', '🧠 [PROFESSOR\'S DEEP DIVE]', clean_text)
-            
-            # 2. 扒掉剩下正文内容的 blockquote 箭头
             clean_text = clean_text.replace("> ", "")
             
-            # 3. Dynamic Subject Line Update
             try:
                 first_tag = re.search(r'#(\w+)', content).group(1)
             except:
                 first_tag = "Latest Research"
             msg['Subject'] = f"🤖 Arxiv Hunter [{first_tag}]: {today_str}"
 
-            # 4. 彻底移除截断逻辑！直接将满血清洗后的三篇完整长文塞进邮件！
-            short_email_text = clean_text
+            msg.attach(MIMEText(clean_text, 'plain', 'utf-8'))
 
-            # Attach the clean, shortened text
-            msg.attach(MIMEText(short_email_text, 'plain', 'utf-8'))
-
-            # Execute SMTP transmission (Bypassing Windows Hostname Bug)
-            server = smtplib.SMTP_SSL(smtp_server, smtp_port, local_hostname='localhost')
+            # Execute SMTP transmission
+            server = smtplib.SMTP_SSL(smtp_server, 465, local_hostname='localhost')
             server.login(sender_email, app_password)
             server.send_message(msg)
             server.quit()
@@ -205,53 +225,47 @@ class ArxivHunter:
             print(f"[ORCHESTRATOR] SUCCESS! Target acquired. Clean Email dispatched to {receiver_email}.")
         except Exception as e:
             print(f"[ERROR] Action Layer failed to dispatch email: {e}")
+            raise # Propagate error for visibility
 
 
 if __name__ == "__main__":
     # --- 1. SYSTEM CONFIGURATION ---
-    
-    # 第一步：激活保险箱！
     load_dotenv()
-    
-    # 第二步：安全读取机密信息 (OS 会自动去 .env 文件里找对应的值)
     api_key = os.getenv("GLM_API_KEY")
     obsidian_path = os.getenv("OBSIDIAN_PATH")
-    sender_email = os.getenv("SENDER_EMAIL")
-    app_password = os.getenv("EMAIL_PASSWORD")
-    receiver_email = os.getenv("RECEIVER_EMAIL")
-    
-    # 邮箱服务器是公开的地址，不需要保密
-    smtp_server = "smtp.163.com" 
     
     # Ignite the Orchestrator
     hunter = ArxivHunter(glm_api_key=api_key)
     
-    # --- 2. THE AUTONOMOUS LOOP ---
-    # 【V2.1.1 终极防御补丁】：不仅防丢失，还要防空字符串！
     target_topic = os.getenv("TARGET_TOPIC")
-    if not target_topic:  # 如果是 None 或者 ""，全部判定为失效
+    if not target_topic:  
         target_topic = "Embodied AI"
 
     print(f"\n--- INITIATING HUNT SEQUENCE FOR: {target_topic} ---")
     
-    # 【V2.1 修改】：把写死的 "Embodied AI" 换成动态变量 target_topic
-    retrieved_papers = hunter.hunt_papers(query=target_topic, max_results=15)
-    
-    print("\n--- INITIATING COGNITIVE DIGEST ---")
-    final_report = hunter.digest_papers(papers=retrieved_papers)
-    
-    # Execute Phase 4 (Write to Disk -> Dispatch to Phone)
-    if not final_report.startswith("> [!error]"):
-        hunter.save_report(content=final_report, vault_path=obsidian_path)
+    # --- 2. THE ATOMIC APN LOOP ---
+    try:
+        # Phase 1 & 2: Generate
+        retrieved_papers = hunter.hunt_papers(query=target_topic, max_results=15)
+        print("\n--- INITIATING COGNITIVE DIGEST ---")
+        final_report = hunter.digest_papers(papers=retrieved_papers)
         
-        hunter.dispatch_email(
-            content=final_report, 
-            sender_email=sender_email, 
-            app_password=app_password, 
-            receiver_email=receiver_email, 
-            smtp_server=smtp_server
-        )
-    else:
-        print("[ORCHESTRATOR] Aborting Phase 4 due to Cognitive Layer error.")
+        if final_report.startswith("> [!error]"):
+            raise Exception("Cognitive Layer returned an error block.")
+
+        # Phase 3: Vault Persistence
+        try:
+            hunter.save_report(content=final_report, vault_path=obsidian_path)
+        except Exception as e:
+            print(f"[HELIX_WARNING] Local Persistence Failed: {e}")
+            
+        # Phase 4: Network Dispatch
+        try:
+            hunter.send_email(content=final_report)
+        except Exception as e:
+            print(f"[HELIX_WARNING] Network Dispatch Failed: {e}")
+
+        print("\n[SYSTEM] Arxiv Hunter APN routine complete. Mission Accomplished. Entering standby.")
         
-    print("\n[SYSTEM] Arxiv Hunter routine complete. Mission Accomplished. Entering standby.")
+    except Exception as fatal_error:
+        print(f"\n[CRITICAL FAILURE] Hunt sequence aborted: {fatal_error}")
