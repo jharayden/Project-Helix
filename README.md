@@ -3,7 +3,7 @@
 ![Version](https://img.shields.io/badge/Version-4.0.0_(Matrix)-00FF66.svg?style=for-the-badge)
 ![Python](https://img.shields.io/badge/Backend-FastAPI-009688.svg?style=for-the-badge&logo=fastapi)
 ![Frontend](https://img.shields.io/badge/Frontend-Tailwind_|_Canvas-38B2AC.svg?style=for-the-badge)
-![Brain](https://img.shields.io/badge/Brain-GLM--4_Plus-purple.svg?style=for-the-badge)
+![Brain](https://img.shields.io/badge/Brain-GLM--5-purple.svg?style=for-the-badge)
 
 Welcome to **Project Helix v4.0: The Matrix Edition**. 
 
@@ -45,7 +45,7 @@ Helix runs on a language called Python. We need to install it on your computer.
 ### Phase 3: Get Your "Magic Keys" (Free!)
 Helix needs an AI brain and an email account to send you reports. You need to get two secret passwords:
 
-**1. The AI Brain Key (GLM-4):**
+**1. The AI Brain Key (GLM-5):**
 * Go to **[open.bigmodel.cn](https://open.bigmodel.cn/)** (Zhipu AI) and register for a free account.
 * Click on your profile/dashboard and find the **"API Keys"** menu.
 * Click "Create new API key" (or copy the default one). It will look like a long string of random letters and numbers. Keep this page open.
@@ -53,9 +53,9 @@ Helix needs an AI brain and an email account to send you reports. You need to ge
 **2. The Email Dispatch Key (163 Mail):**
 * *Note: Helix uses 163.com by default, but you can use others if you know how to configure SMTP.*
 * Log into your 163 email account on the web.
-* Go to **Settings (设置)** -> **POP3/SMTP/IMAP**.
+* Go to **Settings** -> **POP3/SMTP/IMAP**.
 * Turn **ON** the "SMTP Service". 
-* It will ask you to verify your phone number and will then give you an **Authorization Code (授权码)**. It usually looks like a 16-letter random password. 
+* It will ask you to verify your phone number and will then give you an **Authorization Code**. It usually looks like a 16-letter random password. 
 * 🚨 *Never use your actual email login password! Only use this special Authorization Code.*
 
 ### Phase 4: Configure The Secret File (`.env`)

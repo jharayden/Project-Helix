@@ -36,7 +36,7 @@ robust, production-ready backend architecture.
 📦 INFRASTRUCTURE & DEPLOYMENT
 ==========================================================================
 - [Cleanup] Purged legacy 'zhipuai' package in favor of universal 
-  OpenAI SDK routing for GLM-4/5 endpoints.
+  OpenAI SDK routing for GLM-5 endpoints.
 - [Security] Standardized .env.example with secure placeholders and 
   added protection for the local Vault via .gitignore.
 - [Automation] Upgraded GitHub Actions to v4/v5 with pip-caching for 
