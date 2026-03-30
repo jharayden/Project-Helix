@@ -1,4 +1,5 @@
 import os
+import shutil
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -13,6 +14,42 @@ from openai import OpenAI
 # Load secure credentials
 load_dotenv()
 os.environ["NO_PROXY"] = "*"
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+raw_path = os.getenv("OBSIDIAN_PATH", "").strip()
+
+# 1. 兜底逻辑：确定总仓位置
+if raw_path:
+    MASTER_VAULT = raw_path
+else:
+    MASTER_VAULT = os.path.join(BASE_DIR, "Vault")
+
+os.makedirs(MASTER_VAULT, exist_ok=True)
+print(f"[SYSTEM] Core Vault synchronized at: {MASTER_VAULT}")
+
+# [偷天换日的核心！] 强行把确定好的路径塞回系统环境变量里！
+# 这样一来，你 api.py 下面的所有接口，以及 hunter.py 和 githuber.py，
+# 读取 os.getenv("OBSIDIAN_PATH") 时，拿到的都是这个绝对正确的路径！
+os.environ["OBSIDIAN_PATH"] = MASTER_VAULT
+
+# 2. 自动搬运工：把 git pull 拉回来的文件，塞进总仓！
+for folder in ["Arxiv_Papers", "GitHuber"]:
+    cloud_folder = os.path.join(BASE_DIR, folder)
+    target_folder = os.path.join(MASTER_VAULT, folder)
+    
+    # 如果根目录有云端拉下来的文件夹
+    if os.path.exists(cloud_folder):
+        os.makedirs(target_folder, exist_ok=True)
+        # 遍历里面的 .md 文件
+        for file_name in os.listdir(cloud_folder):
+            if file_name.endswith(".md"):
+                cloud_file = os.path.join(cloud_folder, file_name)
+                target_file = os.path.join(target_folder, file_name)
+                # 如果总仓里还没有这个文件，就复制过去
+                if not os.path.exists(target_file):
+                    shutil.copy2(cloud_file, target_file)
+                    print(f"[SYNC] Moved cloud intelligence to vault: {file_name}")
+# =================================================================
 
 # Initialize FastAPI Core
 app = FastAPI(title="Project Helix API", version="3.6.0")

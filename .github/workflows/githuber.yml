@@ -32,3 +32,11 @@ jobs:
           OBSIDIAN_PATH: "./"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python githuber.py  # <--- 这次千万别再写成 hunter.py 了！！！
+      
+      - name: 📦 Push to GitHub Repository
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add Arxiv_Papers/ GitHuber/ Vault/ || true
+          git commit -m "chore: auto-sync nightly intelligence reports" || echo "No new files to sync"
+          git push
