@@ -1,33 +1,34 @@
-name: Autonomous Daily Hunter
+name: GitHuber (Nightly)
 
 on:
   schedule:
-    - cron: '17 22 * * *'
+    - - cron: '29 10 * * *'
   workflow_dispatch: 
 
 jobs:
   execute-hunt:
-    runs-on: ubuntu-latest # 使用 GitHub 免费提供的超级 Linux 服务器
+    runs-on: ubuntu-latest
 
     steps:
       - name: 📥 Checkout Repository
-        uses: actions/checkout@v4 # [升级到 v4]
+        uses: actions/checkout@v4
 
       - name: ⚙️ Setup Python 3.10 Engine
-        uses: actions/setup-python@v5 # [升级到 v5]
+        uses: actions/setup-python@v5
         with:
           python-version: '3.10'
-          cache: 'pip' # [新增] 缓存依赖，让启动速度快 3 倍
+          cache: 'pip'
 
       - name: ⛽ Inject Fuel (Install Dependencies)
         run: pip install -r requirements.txt
 
       - name: 🚀 IGNITION! (Run Agent)
-        env: 
+        env:
           GLM_API_KEY: ${{ secrets.GLM_API_KEY }}
           SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
           EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
           RECEIVER_EMAIL: ${{ secrets.RECEIVER_EMAIL }}
-          TARGET_TOPIC: ${{ vars.TARGET_TOPIC }} 
-          OBSIDIAN_PATH: "./" 
-        run: python hunter.py
+          # TARGET_TOPIC 已经被我们在 python 脚本里切断了，这里不用传了
+          OBSIDIAN_PATH: "./"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python githuber.py  # <--- 这次千万别再写成 hunter.py 了！！！

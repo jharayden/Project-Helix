@@ -268,4 +268,6 @@ if __name__ == "__main__":
         print("\n[SYSTEM] Arxiv Hunter APN routine complete. Mission Accomplished. Entering standby.")
         
     except Exception as fatal_error:
+        import sys
         print(f"\n[CRITICAL FAILURE] Hunt sequence aborted: {fatal_error}")
+        sys.exit(1) # <--- 让 Arxiv 的 HTTP 429 真实地反映在 GitHub 状态上

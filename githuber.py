@@ -287,19 +287,21 @@ class GitHuber:
     
 
 if __name__ == "__main__":
+    import sys
     # --- 1. SYSTEM CONFIGURATION ---
     # Ensure environment is loaded when running standalone
     load_dotenv()
     
     githuber = GitHuber()
-    target_topic = os.getenv("TARGET_TOPIC", "") # Optional manual override
     
     print("\n--- INITIATING GITHUB LOBSTER HUNT SEQUENCE ---")
     
     # --- 2. THE ATOMIC APN LOOP ---
     try:
         # Phase 1: Hunt
-        lobster = githuber.hunt_top_lobster(query=target_topic)
+        # [V4.0 FIX] 彻底切断与 TARGET_TOPIC 的联系！
+        # 自动化脚本或终端运行时，永远传入空字符串 ""，只抓全网增速最快的龙虾！
+        lobster = githuber.hunt_top_lobster(query="")
         
         if not lobster:
             raise Exception("Sensor Layer failed to lock onto a valid target.")
@@ -330,3 +332,5 @@ if __name__ == "__main__":
         
     except Exception as fatal_error:
         print(f"\n[CRITICAL FAILURE] GitHuber hunt sequence aborted: {fatal_error}")
+        # [关键修复] 如果出错，立刻通知系统进程异常退出，让 GitHub Actions 标红！
+        sys.exit(1)
