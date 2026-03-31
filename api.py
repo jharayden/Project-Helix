@@ -91,7 +91,7 @@ async def trigger_arxiv_hunter(request: HuntRequest):
         hunter = ArxivHunter(glm_api_key=api_key)
         
         # 1. GENERATE: Execute LLM Pipeline
-        papers = hunter.hunt_papers(query=request.target_topic, max_results=10)
+        papers = hunter.hunt_papers(query=actual_topic, max_results=10)
         report = hunter.digest_papers(papers=papers)
         
         if not report or report.startswith("> [!error]"):

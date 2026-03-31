@@ -1,0 +1,12 @@
+🚀 feat(core): Project Helix V5.0 - The Desktop Singularity
+
+This is the magnum opus update. Project Helix has officially evolved from a headless local script into a standalone, borderless Windows desktop application, while achieving a true Hybrid Cloud-Local architecture.
+
+🔥 Core Architectural Upgrades:
+- [Desktop Singularity] Eradicated terminal requirements. Fused FastAPI and HTML Canvas into a single native `.exe` using PyWebView & PyInstaller.
+- [Cloud Ghost-Sync] Refactored GitHub Actions pipeline and `.gitignore` shields. Cloud-generated Markdown intel now forces its way into the repo and silently syncs to the local Obsidian Vault upon app launch.
+- [Zero-Friction UX] Decapitated the old `Helix.bat` startup sequence. Implemented transparent Alpha-channel icon caching overrides.
+- [Documentation] Rewrote README with a foolproof, consumer-grade installation guide. Stripped hardcoded version numbers from the frontend for eternal backwards compatibility.
+
+Project Helix is now fully autonomous.
+Ignition sequence complete.
