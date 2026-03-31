@@ -7,12 +7,11 @@
 .env.*
 !.env.example
 
-# 2. 本地金库数据 (Local Vault Data - NEVER UPLOAD)
-# 保护你的私人情报文件，防止被 Push 到公开仓库
-Vault/
-Arxiv_Papers/
-GitHuber/
-*.md
+# 2. 本地金库数据 - [修正：允许同步以解决拉不到文件的问题]
+!Vault/
+!Arxiv_Papers/
+!GitHuber/
+!*.md
 
 # 3. 允许上传的特例文档 (Except for the README)
 !README.md
@@ -34,3 +33,9 @@ env/
 Thumbs.db
 .vscode/
 .idea/
+
+# 7. 桌面应用打包产物 (Build Artifacts - NEVER UPLOAD)
+build/
+dist/
+*.exe
+*.spec

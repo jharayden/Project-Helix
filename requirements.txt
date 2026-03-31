@@ -13,3 +13,7 @@ requests
 
 # Environment Management
 python-dotenv
+
+pywebview
+pyinstaller
+uvicorn
