@@ -178,21 +178,16 @@ Whenever you want to use Helix, simply **double-click the `Helix Command Center`
 Helix isn't just a local app; it's a **True Hybrid System**. Configure `.github/workflows/daily_hunt.yml` and `githuber.yml` with your repository secrets. GitHub's enterprise Linux servers will autonomously hunt at 6:17 AM and 10:29 AM every day, bypassing local network restrictions. **V5.0 Update:** The cloud bypasses strict `.gitignore` rules to force-sync Markdown reports into your repository. Whenever you open your local Helix App, it automatically fetches these cloud reports straight into your local Vault. You wake up, and the intel is already there.
 
 ---
+## 🗺️ Roadmap (The Legacy)
 
-## 🗺️ Roadmap
-
-- [x] **V2.0:** Base LLM integration, SMTP setup, and daily automation via Actions.
-    
-- [x] **V3.5:** Velocity Radar, CTO Persona, Smart Folder Routing.
-    
-- [x] **V3.6.0 (The UI Overhaul):** Complete front-end/back-end separation (FastAPI + JS). Implementation of **SYNAPSE Copilot**, GSAP Animations, Local Vault Reader, and State Memory.
-    
-- [x] **V4.0.0 (The Matrix Edition):** Cinematic data-driven code rain, intelligent UI braking system, robust `.env` vs UI payload routing, and foolproof empty-state handling.
-    
-- [x] **V5.0.0 (The Desktop Singularity):** Transformed the SPA into a standalone Windows `.exe` application using PyWebView and PyInstaller. Eliminated terminal requirements, solved transparent icon caching, and implemented the foolproof setup guide.
-    
-- [ ] **V5.1.0 (Cross-Platform Expansion):** Adapt the PyWebView compilation pipeline for native macOS (`.app`) and Linux (`.AppImage`) support.
-    
-- [ ] **V6.0.0 (Local LLM Integration):** Decouple from cloud API keys. Implement seamless hookups for local open-source models (e.g., Ollama, Llama-3) for absolute, air-gapped data privacy.
+- [x] **V2.0 | [cite_start]The Genesis:** Base LLM integration, SMTP setup, and initial automation protocols[cite: 7].
+- [x] **V3.5 | [cite_start]Tactical Upgrade:** Velocity Radar, CTO Persona, and Smart Folder Routing logic[cite: 7].
+- [x] **V3.6.0 | The UI Overhaul:** Complete front-end/back-end separation (FastAPI + JS). [cite_start]Implementation of **SYNAPSE Copilot**, GSAP Animations, and Local Vault Reader[cite: 7].
+- [x] **V4.0.0 | [cite_start]The Matrix Edition:** Cinematic data-driven code rain, intelligent UI braking system, and robust `.env` payload routing[cite: 7].
+- [x] **V5.0.0 | [cite_start]The Desktop Singularity:** Transformation into a standalone Windows `.exe` application via PyWebView & PyInstaller[cite: 7].
+- [x] **[FINAL] TOMBSTONE | The Eternal Localism:** - **Buried the Cloud:** Stripped all GitHub Actions and `git pull` dependencies.
+    - **Native Biological Clock:** Integrated `APScheduler` for ironclad local timing (Arxiv @ 08:30 | GitHub @ 19:30).
+    - **Sovereign Intelligence:** Decoupled from all external orchestrators. The engine now persists entirely within the local machine.
+    - **Encoding Hardening:** Purged all unstable Unicode/ASCII artifacts for absolute Windows environment stability.
 ---
 *Built with excessive amounts of coffee, minus sleep, and a refusal to read bad papers manually.*

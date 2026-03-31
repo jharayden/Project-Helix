@@ -17,3 +17,4 @@ python-dotenv
 pywebview
 pyinstaller
 uvicorn
+apscheduler
