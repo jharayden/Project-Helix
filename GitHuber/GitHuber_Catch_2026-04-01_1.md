@@ -1,0 +1,19 @@
+# 🦞 Today's Top Catch: Claude Code Architecture Study
+#CLIResearch #AgentArchitecture #GitHubHunter
+
+> [!info] 🎯 Target Locked
+> **Repo Link:** https://github.com/sanbuphy/learn-coding-agent
+> **Tech Stack:** Documentation Analysis, CLI Agent Architecture
+> **One-Line Pitch:** A deep-dive technical analysis of Claude Code's internal architecture, hidden features, and telemetry systems.
+
+> [!summary] 📦 1. Core Identity
+> This isn't another AI coding tool or framework—it's a forensic engineering reverse-lookbook into Anthropic's Claude Code CLI agent. The repo meticulously dissects Claude Code's architecture, breaking down its tool system (40+ tools), permission flows, and progressive harness mechanisms that transform a basic agent loop into a production-ready coding assistant. What you're getting here is essentially the "engineering schematics" of one of the most sophisticated CLI agents on the market, compiled from public leaks, community discussions, and architectural analysis. It's not a product you use directly; it's a blueprint you study to understand how modern AI agents are built, secured, and remotely controlled. The documentation quadrilingual (EN/JA/KO/ZH) and covers everything from telemetry privacy to undercover modes for hiding AI authorship in open-source projects.
+
+> [!example] 💎 2. The "Lobster" Value
+> The commercial value here isn't in using this tool—it's in the competitive intelligence it provides. For any company building AI agents, this repository saves thousands of engineering hours in reverse-engineering competitor behavior. It exposes Claude Code's telemetry systems (what's collected and why you can't opt out), hidden feature flags (Capybara/Tengu/Numbat codenames), and remote control mechanisms (killswitches, model overrides). For indie developers, it's a masterclass in how Anthropic balances power with control—critical if you're evaluating whether to build on their platform. The real value is in understanding the "unwritten rules" of AI agent architecture, which could save your team from architectural missteps that cost millions in development time.
+
+> [!quote] 🛠️ 3. Deployment & Friction
+> This is a documentation repository, so there's no installation or deployment—just pure knowledge extraction. The friction is minimal: clone the repo, navigate to `docs/en/`, and start reading. The documentation is exceptionally well-structured, with each report diving deep into a specific aspect of Claude Code's architecture. For maximum value, I recommend reading the reports in order: start with telemetry (to understand what Anthropic is collecting), then move to hidden features (to see what capabilities aren't advertised), followed by undercover mode (if you're concerned about AI transparency in your projects). The only friction is the sheer density of information—this isn't a casual read; it's a technical deep dive that requires focus.
+
+> [!abstract] ⚙️ 4. The Ideal Workflow & SOP
+> The ideal workflow for this repository is as a "pre-mortem" tool for AI agent architecture decisions. Before your team commits to building on Claude's platform or designing a similar agent, spend a day with these reports to understand: (1) How telemetry is implemented and why it's non-negotiable (critical for privacy-compliant products), (2) How feature flags and codename systems work (so you can plan your own rollout strategy), and (3) How remote control mechanisms are built (to design your own killswitches and override systems). Use this as a reference when designing your agent's tool system—understand how permissions flow between sub-agents and how progressive harness layers add production features without breaking the core agent loop. This is the difference between building a toy AI assistant and a production-grade coding agent.
